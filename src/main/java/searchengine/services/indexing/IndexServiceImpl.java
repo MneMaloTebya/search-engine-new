@@ -19,9 +19,7 @@ import searchengine.services.page_parser.ParserThread;
 import searchengine.services.site.SiteService;
 
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.*;
 
 @Service
 public class IndexServiceImpl implements IndexService {
@@ -61,7 +59,7 @@ public class IndexServiceImpl implements IndexService {
         siteService.deleteByUrl(site.getUrl());
         SiteDto dto = SiteDtoMapper.toDomain(siteService.save(site, StatusType.INDEXING));
         //try {
-            ParserThread parserThread = new ParserThread(dataInserterService, dto, site.getUrl(), myConnector);
+            ParserThread parserThread = new ParserThread(dataInserterService, dto, site.getUrl(), myConnector, executor);
             Future<ThreadResponse> future = executor.submit(parserThread);
             if (future.isDone()) {
                 siteService.changeStatus(dto, StatusType.INDEXED);

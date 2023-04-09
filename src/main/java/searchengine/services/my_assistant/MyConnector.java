@@ -30,7 +30,8 @@ public class MyConnector {
             return Jsoup.connect(linkPage)
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .referrer("http://google.com")
-                    .timeout(0).execute();
+                    .timeout(0)
+                    .execute();
         } catch (HttpStatusException e) {
             String path = PageValidator.getPathFromUrl(linkPage);
             dataInserterService.insertBadUrlToDB(dto, path, e.getStatusCode());

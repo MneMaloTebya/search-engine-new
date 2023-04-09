@@ -2,12 +2,12 @@
 
 indexing-settings:
   sites:
-    - url: https://nikoartgallery.com/
-      name: Nikoartgallery
+#    - url: https://nikoartgallery.com/
+#      name: Nikoartgallery
 #    - url: http://www.ipfran.ru/
 #      name: ipfran
-#    - url: https://www.playback.ru/
-#      name: PlayBack.Ru
+    - url: https://www.playback.ru/
+      name: PlayBack.Ru
 
 
 server:
