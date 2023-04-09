@@ -63,4 +63,9 @@ public class SiteServiceImpl implements SiteService{
         }
         return null;
     }
+
+    @Override
+    public Optional<SiteEntity> findByUrlContains(String pageUrl) {
+        return siteRepository.findByUrlContains(pageUrl);
+    }
 }

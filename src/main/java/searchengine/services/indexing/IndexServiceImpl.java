@@ -11,13 +11,16 @@ import searchengine.dto.indexing.IndexingResponse;
 import searchengine.dto.indexing.ThreadResponse;
 import searchengine.model.domain.SiteDto;
 import searchengine.model.domain.SiteDtoMapper;
+import searchengine.model.entity.PageEntity;
 import searchengine.model.entity.SiteEntity;
 import searchengine.services.index_assistant.DataInserterService;
 import searchengine.services.my_assistant.MyConnector;
+import searchengine.services.page.PageService;
 import searchengine.services.page_parser.PageValidator;
 import searchengine.services.page_parser.ParserThread;
 import searchengine.services.site.SiteService;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.*;
 
@@ -26,15 +29,17 @@ public class IndexServiceImpl implements IndexService {
 
     private final SitesList sitesList;
     private final SiteService siteService;
+    private final PageService pageService;
     private final ThreadPoolExecutor executor;
     private final DataInserterService dataInserterService;
     private final MyConnector myConnector;
 
     @Autowired
-    public IndexServiceImpl(SitesList sitesList, SiteService siteService,  DataInserterService dataInserterService, MyConnector myConnector) {
+    public IndexServiceImpl(SitesList sitesList, SiteService siteService, PageService pageService, DataInserterService dataInserterService, MyConnector myConnector) {
         this.sitesList = sitesList;
         this.siteService = siteService;
         this.executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sitesList.getSites().size());
+        this.pageService = pageService;
         this.dataInserterService = dataInserterService;
         this.myConnector = myConnector;
     }
@@ -93,5 +98,39 @@ public class IndexServiceImpl implements IndexService {
             }
         }
         return response;
+    }
+
+    @Override
+    public IndexingResponse indexPage(String url) {
+        IndexingResponse response = null;
+        if (urlIsLocatedConfig(url)) {
+            response = new ErrorIndexingResponse("Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
+        }
+
+        Optional<SiteEntity> optionalSite = siteService.findByUrlContains(url);
+        Optional<PageEntity> optionalPage = pageService
+                .findPageEntityByPathAndSiteId(PageValidator.getPathFromUrl(url), optionalSite.get().getId());
+        if (optionalPage.isPresent()) {
+            // TODO: 09.04.2023 удалить существующие индексы и леммы
+        } else {
+            // TODO: 09.04.2023 логика добавления новой страницы ее индексов и лемм
+
+            response = new CorrectIndexingResponse();
+            response.setResult(true);
+        }
+        return response;
+    }
+
+    private boolean urlIsLocatedConfig(String url) {
+        List<String> siteUrl = new ArrayList<>();
+        for (Site site : sitesList.getSites()) {
+            siteUrl.add(site.getUrl());
+        }
+        for (String site : siteUrl) {
+            if (site.contains(PageValidator.getHostFromUrl(url))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -17,6 +17,10 @@ public class ErrorIndexingResponse extends IndexingResponse {
         this.result = result;
     }
 
+    public void setError(String error) {
+        this.error = error;
+    }
+
     public boolean isResult() {
         return result;
     }

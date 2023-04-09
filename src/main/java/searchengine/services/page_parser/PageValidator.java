@@ -47,6 +47,15 @@ public class PageValidator {
         return path;
     }
 
+    public static String getHostFromUrl(String pageUrl) {
+        try {
+            URL url = new URL(pageUrl);
+            return url.getHost();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void removeUrls(Set<String> urlsSet) {
         urlsSet.removeIf(i -> true);
     }

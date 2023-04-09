@@ -13,5 +13,5 @@ public interface SiteService {
     Optional<SiteEntity> findByUrl(String url);
     SiteEntity save(Site site, StatusType statusType);
     SiteEntity changeStatus(SiteDto dto, StatusType statusType);
-
+    Optional<SiteEntity> findByUrlContains(String pageUrl);
 }
