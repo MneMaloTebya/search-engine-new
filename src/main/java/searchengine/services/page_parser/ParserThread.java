@@ -15,12 +15,10 @@ public class ParserThread implements Callable<Boolean> {
 
     public ParserThread(DataInserterService dataInserterService, SiteDto dto, String currentUrl, MyConnector myConnector) {
         this.myConnector = myConnector;
-        pageParserService = new PageParserServiceImpl(dataInserterService, this.myConnector);
+        pageParserService = new PageParserServiceImpl(dataInserterService, myConnector);
         Set<String> siteDataMainPage = pageParserService.parsing(currentUrl, dto);
         recursiveTask = new RecursiveTask(siteDataMainPage, pageParserService, dto);
     }
-
-
 
     @Override
     public Boolean call() {
