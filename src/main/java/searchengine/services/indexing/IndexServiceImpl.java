@@ -80,6 +80,7 @@ public class IndexServiceImpl implements IndexService {
     public IndexingResponse stopIndex() {
         IndexingResponse response = null;
         if (executor.getActiveCount() == 0) {
+            stopRecursiveTask();
             response = new ErrorIndexingResponse("Индексация не запущена");
         } else {
             stopRecursiveTask();
