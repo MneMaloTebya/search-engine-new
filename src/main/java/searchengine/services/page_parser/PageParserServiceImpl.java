@@ -1,18 +1,15 @@
 package searchengine.services.page_parser;
 
-import org.jsoup.HttpStatusException;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import searchengine.model.domain.SiteDto;
-import searchengine.model.entity.SiteEntity;
 import searchengine.services.index_assistant.DataInserterService;
 import searchengine.services.my_assistant.MyConnector;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -59,8 +56,6 @@ public class PageParserServiceImpl implements PageParserService {
                     }
                 }
             }
-        } catch (HttpStatusException e) {
-            return Collections.emptySet();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

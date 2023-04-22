@@ -1,5 +1,7 @@
 package searchengine.services.indexing;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import searchengine.config.Site;
@@ -8,20 +10,22 @@ import searchengine.dto.StatusType;
 import searchengine.dto.indexing.ErrorIndexingResponse;
 import searchengine.dto.indexing.CorrectIndexingResponse;
 import searchengine.dto.indexing.IndexingResponse;
-import searchengine.dto.indexing.ThreadResponse;
 import searchengine.model.domain.SiteDto;
 import searchengine.model.domain.SiteDtoMapper;
 import searchengine.model.entity.PageEntity;
 import searchengine.model.entity.SiteEntity;
 import searchengine.services.index_assistant.DataInserterService;
 import searchengine.services.my_assistant.MyConnector;
+import searchengine.services.my_assistant.TaskContext;
 import searchengine.services.page.PageService;
 import searchengine.services.page_parser.PageValidator;
 import searchengine.services.page_parser.ParserThread;
 import searchengine.services.site.SiteService;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.*;
 
 @Service
@@ -30,31 +34,36 @@ public class IndexServiceImpl implements IndexService {
     private final SitesList sitesList;
     private final SiteService siteService;
     private final PageService pageService;
-    private final ThreadPoolExecutor executor;
     private final DataInserterService dataInserterService;
     private final MyConnector myConnector;
+    private final ThreadPoolExecutor executor;
+    private final List<Future> futures = new ArrayList<>();
+    private static final Log log = LogFactory.getLog(IndexServiceImpl.class);
+
 
     @Autowired
     public IndexServiceImpl(SitesList sitesList, SiteService siteService, PageService pageService, DataInserterService dataInserterService, MyConnector myConnector) {
         this.sitesList = sitesList;
         this.siteService = siteService;
-        this.executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sitesList.getSites().size());
         this.pageService = pageService;
         this.dataInserterService = dataInserterService;
         this.myConnector = myConnector;
+        this.executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(sitesList.getSites().size());
     }
 
     @Override
     public IndexingResponse startIndex() {
         PageValidator.removeUrls(PageValidator.getUrlsSite());
+        TaskContext.removeAll();
+
         if (executor.getActiveCount() > 0) {
             IndexingResponse response = new ErrorIndexingResponse();
             response.setResult(false);
             return response;
         }
-        for (Site site : sitesList.getSites()) {
-            startSiteIndex(site);
-        }
+
+        sitesList.getSites().forEach(this::startSiteIndex);
+
         IndexingResponse response = new CorrectIndexingResponse();
         response.setResult(true);
         return response;
@@ -63,18 +72,8 @@ public class IndexServiceImpl implements IndexService {
     private void startSiteIndex(Site site) {
         siteService.deleteByUrl(site.getUrl());
         SiteDto dto = SiteDtoMapper.toDomain(siteService.save(site, StatusType.INDEXING));
-        //try {
-            ParserThread parserThread = new ParserThread(dataInserterService, dto, site.getUrl(), myConnector, executor);
-            Future<ThreadResponse> future = executor.submit(parserThread);
-            if (future.isDone()) {
-                siteService.changeStatus(dto, StatusType.INDEXED);
-                //future.cancel(true);
-            }
-            //siteService.changeStatus(siteEntity, StatusType.INDEXED);
-//        } catch (Exception e) {
-//            siteEntity.setLastError(e.getMessage());
-//            siteService.save(site, StatusType.FAILED);
-//        }
+        ParserThread parserThread = new ParserThread(dataInserterService, dto, site.getUrl(), myConnector);
+        futures.add(executor.submit(parserThread));
     }
 
     @Override
@@ -83,6 +82,8 @@ public class IndexServiceImpl implements IndexService {
         if (executor.getActiveCount() == 0) {
             response = new ErrorIndexingResponse("Индексация не запущена");
         } else {
+            stopRecursiveTask();
+            stopExecutor();
             for (Site site : sitesList.getSites()) {
                 Optional<SiteEntity> optionalSite = siteService.findByUrl(site.getUrl());
                 if (optionalSite.isPresent()) {
@@ -90,12 +91,13 @@ public class IndexServiceImpl implements IndexService {
                     SiteDto dto = SiteDtoMapper.toDomain(entity);
                     if (entity.getStatusType().equals(StatusType.INDEXING)) {
                         entity.setLastError("Индексация прервана");
+                        entity.setStatusType(StatusType.FAILED);
                         siteService.changeStatus(dto, StatusType.FAILED);
                         response = new CorrectIndexingResponse();
-                        executor.shutdownNow(); // todo потоки не останавливаются
                     }
                 }
             }
+
         }
         return response;
     }
@@ -132,5 +134,21 @@ public class IndexServiceImpl implements IndexService {
             }
         }
         return false;
+    }
+
+    private void stopRecursiveTask() {
+        TaskContext.getTasks().forEach(t -> {
+            t.cancel(true);
+            log.info(t + " прервана: " + t.isDone());
+        });
+        executor.shutdown();
+    }
+
+    private void stopExecutor() {
+        futures.forEach(f -> {
+            f.cancel(true);
+            log.info("Фьючер завершил работу: " + f.isDone());
+        });
+        executor.shutdownNow();
     }
 }

@@ -11,7 +11,6 @@ import searchengine.model.domain.SiteDto;
 import searchengine.services.index_assistant.DataInserterService;
 import searchengine.services.indexing.IndexServiceImpl;
 import searchengine.services.page_parser.PageValidator;
-import searchengine.services.site.SiteService;
 import java.io.IOException;
 
 @Service

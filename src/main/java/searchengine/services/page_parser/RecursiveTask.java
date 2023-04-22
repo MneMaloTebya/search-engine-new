@@ -1,6 +1,7 @@
 package searchengine.services.page_parser;
 
 import searchengine.model.domain.SiteDto;
+import searchengine.services.my_assistant.TaskContext;
 
 import java.util.*;
 
@@ -18,15 +19,14 @@ public class RecursiveTask extends java.util.concurrent.RecursiveTask<Set<String
 
     @Override
     public Set<String> compute() {
-       List<RecursiveTask> taskList = new ArrayList<>();
        Set<String> urls = new HashSet<>();
        for (String recursiveLink : siteUrls) {
            Set<String> urlsSet = pageParserService.parsing(recursiveLink, dto);
            RecursiveTask task = new RecursiveTask(urlsSet, pageParserService, dto);
+           TaskContext.addTask(task);
            task.fork();
-           taskList.add(task);
        }
-       for (RecursiveTask task : taskList) {
+       for (RecursiveTask task : TaskContext.getTasks()) {
            urls.addAll(task.join());
        }
         return urls;
