@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class SiteServiceImpl implements SiteService{
+public class SiteServiceImpl implements SiteService {
 
     private final SiteRepository siteRepository;
     private final PageRepository pageRepository;
@@ -52,16 +52,11 @@ public class SiteServiceImpl implements SiteService{
     }
 
     @Override
-    public SiteEntity changeStatus(SiteDto dto, StatusType statusType) {
-        Optional<SiteEntity> optionalSite = findByUrl(dto.getUrl());
-        if (optionalSite.isPresent()) {
-            SiteEntity site = optionalSite.get();
-            dto.setStatusType(statusType);
-            dto.setStatusTime(LocalDateTime.now());
-            siteRepository.save(site);
-            return site;
-        }
-        return null;
+    public SiteEntity changeStatus(SiteEntity site, StatusType statusType) {
+        site.setStatusType(statusType);
+        site.setStatusTime(LocalDateTime.now());
+        siteRepository.save(site);
+        return site;
     }
 
     @Override

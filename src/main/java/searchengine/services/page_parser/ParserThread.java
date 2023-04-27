@@ -11,10 +11,8 @@ public class ParserThread implements Callable<Boolean> {
 
     private final PageParserService pageParserService;
     private final RecursiveTask recursiveTask;
-    private final MyConnector myConnector;
 
     public ParserThread(DataInserterService dataInserterService, SiteDto dto, String currentUrl, MyConnector myConnector) {
-        this.myConnector = myConnector;
         pageParserService = new PageParserServiceImpl(dataInserterService, myConnector);
         Set<String> siteDataMainPage = pageParserService.parsing(currentUrl, dto);
         recursiveTask = new RecursiveTask(siteDataMainPage, pageParserService, dto);

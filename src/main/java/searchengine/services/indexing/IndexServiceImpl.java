@@ -63,6 +63,8 @@ public class IndexServiceImpl implements IndexService {
         }
 
         sitesList.getSites().forEach(this::startSiteIndex);
+        executor.shutdown();
+        System.out.println(executor.isShutdown());
 
         IndexingResponse response = new CorrectIndexingResponse();
         response.setResult(true);
@@ -89,16 +91,14 @@ public class IndexServiceImpl implements IndexService {
                 Optional<SiteEntity> optionalSite = siteService.findByUrl(site.getUrl());
                 if (optionalSite.isPresent()) {
                     SiteEntity entity = optionalSite.get();
-                    SiteDto dto = SiteDtoMapper.toDomain(entity);
                     if (entity.getStatusType().equals(StatusType.INDEXING)) {
                         entity.setLastError("Индексация прервана");
                         entity.setStatusType(StatusType.FAILED);
-                        siteService.changeStatus(dto, StatusType.FAILED);
+                        siteService.changeStatus(entity, StatusType.FAILED);
                         response = new CorrectIndexingResponse();
                     }
                 }
             }
-
         }
         return response;
     }
@@ -142,7 +142,6 @@ public class IndexServiceImpl implements IndexService {
             t.cancel(true);
             log.info(t + " прервана: " + t.isDone());
         });
-        executor.shutdown();
     }
 
     private void stopExecutor() {

@@ -12,6 +12,6 @@ public interface SiteService {
     void deleteByUrl(String url);
     Optional<SiteEntity> findByUrl(String url);
     SiteEntity save(Site site, StatusType statusType);
-    SiteEntity changeStatus(SiteDto dto, StatusType statusType);
+    SiteEntity changeStatus(SiteEntity site, StatusType statusType);
     Optional<SiteEntity> findByUrlContains(String pageUrl);
 }
