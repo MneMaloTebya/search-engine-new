@@ -9,4 +9,5 @@ public interface LemmaService {
     Optional<LemmaEntity> findByLemma(String lemma);
     void deleteAllBySiteId(int id);
     LemmaEntity save(LemmaEntity lemma);
+    int countBySiteId(int id);
 }

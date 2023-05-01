@@ -82,5 +82,4 @@ public class SiteServiceImpl implements SiteService {
             siteRepository.save(entity);
         }
     }
-
 }

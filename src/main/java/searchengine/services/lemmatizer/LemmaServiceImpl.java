@@ -37,4 +37,9 @@ public class LemmaServiceImpl implements LemmaService {
     public LemmaEntity save(LemmaEntity lemma) {
         return lemmaRepository.save(lemma);
     }
+
+    @Override
+    public int countBySiteId(int id) {
+        return lemmaRepository.countBySiteId(id);
+    }
 }

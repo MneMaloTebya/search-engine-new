@@ -99,10 +99,10 @@ public class DataManagerServiceImpl implements DataManagerService {
 
                 if (optionalLemma.isEmpty()) {
                     lemmaEntity.setLemma(lemma);
-                    lemmaEntity.setFrequency(1); // TODO: 01.05.2023 заглушка! Позже поменять.
+                    lemmaEntity.setFrequency(1);
                 } else {
                     lemmaEntity = optionalLemma.get();
-                    lemmaEntity.setFrequency(lemmaEntity.getFrequency() + 1); // TODO: 01.05.2023 заглушка! Позже поменять.
+                    lemmaEntity.setFrequency(lemmaEntity.getFrequency() + 1);
                 }
 
                 lemmaEntity.setSiteId(siteDto.getId());

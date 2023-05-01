@@ -9,4 +9,5 @@ public interface LemmaRepository extends JpaRepository<LemmaEntity, Integer> {
     Optional<LemmaEntity> findBySiteId(int id);
     Optional<LemmaEntity> findByLemma(String lemma);
     void deleteAllBySiteId(int id);
+    int countBySiteId(int id);
 }

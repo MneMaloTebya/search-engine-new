@@ -40,4 +40,9 @@ public class PageServiceImpl implements PageService{
         pageEntity.setSiteId(dto.getId());
         pageRepository.save(pageEntity);
     }
+
+    @Override
+    public int countBySiteId(int id) {
+        return pageRepository.countBySiteId(id);
+    }
 }
