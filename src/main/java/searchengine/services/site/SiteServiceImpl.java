@@ -51,16 +51,36 @@ public class SiteServiceImpl implements SiteService {
         return siteEntity;
     }
 
-    @Override
-    public SiteEntity changeStatus(SiteEntity site, StatusType statusType) {
-        site.setStatusType(statusType);
-        site.setStatusTime(LocalDateTime.now());
-        siteRepository.save(site);
-        return site;
-    }
 
     @Override
     public Optional<SiteEntity> findByUrlContains(String pageUrl) {
         return siteRepository.findByUrlContains(pageUrl);
     }
+
+    @Override
+    public void setFailedStatus(Site site, String message) {
+        Optional<SiteEntity> optionalSite = siteRepository.findByUrl(site.getUrl());
+        if (optionalSite.isPresent()) {
+            SiteEntity entity = optionalSite.get();
+            if (entity.getStatusType().equals(StatusType.INDEXING)) {
+                entity.setStatusType(StatusType.FAILED);
+                entity.setLastError(message);
+                entity.setStatusTime(LocalDateTime.now());
+                siteRepository.save(entity);
+            }
+
+        }
+    }
+
+    @Override
+    public void setIndexedStatus(Site site) {
+        Optional<SiteEntity> optionalSite = siteRepository.findByUrl(site.getUrl());
+        if (optionalSite.isPresent()) {
+            SiteEntity entity = optionalSite.get();
+            entity.setStatusType(StatusType.INDEXED);
+            entity.setStatusTime(LocalDateTime.now());
+            siteRepository.save(entity);
+        }
+    }
+
 }
