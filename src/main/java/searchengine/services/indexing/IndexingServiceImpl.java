@@ -11,10 +11,13 @@ import searchengine.dto.StatusType;
 import searchengine.dto.indexing.ErrorIndexingResponse;
 import searchengine.dto.indexing.CorrectIndexingResponse;
 import searchengine.dto.indexing.IndexingResponse;
+import searchengine.model.domain.PageDto;
+import searchengine.model.domain.PageDtoMapper;
 import searchengine.model.domain.SiteDto;
 import searchengine.model.domain.SiteDtoMapper;
 import searchengine.model.entity.PageEntity;
 import searchengine.model.entity.SiteEntity;
+import searchengine.services.index_assistant.DataManagerService;
 import searchengine.services.my_assistant.TaskContext;
 import searchengine.services.page.PageService;
 import searchengine.services.page_parser.PageParserService;
@@ -22,33 +25,31 @@ import searchengine.services.page_parser.PageValidator;
 import searchengine.services.page_parser.RecursiveTask;
 import searchengine.services.site.SiteService;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ThreadPoolExecutor;
 
 @Service
-public class IndexServiceImpl implements IndexService {
+public class IndexingServiceImpl implements IndexingService {
 
     private final SitesList sitesList;
     private final SiteService siteService;
     private final PageService pageService;
     private final PageParserService pageParserService;
+    private final DataManagerService dataManagerService;
 
     private final TaskContext taskContext = new TaskContext();
     private final ForkJoinPool pool = new ForkJoinPool();
 
-    private static final Log log = LogFactory.getLog(IndexServiceImpl.class);
+    private static final Log log = LogFactory.getLog(IndexingServiceImpl.class);
 
     @Autowired
-    public IndexServiceImpl(SitesList sitesList, SiteService siteService, PageService pageService, PageParserService pageParserService) {
+    public IndexingServiceImpl(SitesList sitesList, SiteService siteService, PageService pageService, PageParserService pageParserService, DataManagerService dataManagerService) {
         this.sitesList = sitesList;
         this.siteService = siteService;
         this.pageService = pageService;
         this.pageParserService = pageParserService;
+        this.dataManagerService = dataManagerService;
     }
 
     @Override
@@ -72,7 +73,7 @@ public class IndexServiceImpl implements IndexService {
         siteService.deleteByUrl(site.getUrl());
         SiteEntity entity = siteService.save(site, StatusType.INDEXING);
         SiteDto dto = SiteDtoMapper.toDomain(entity);
-        pool.invoke(init(dto.getUrl(), dto));
+        pool.invoke(getInstance(dto.getUrl(), dto));
     }
 
     @Override
@@ -99,22 +100,22 @@ public class IndexServiceImpl implements IndexService {
         if (sitesList.urlIsLocatedConfig(url)) {
             response = new ErrorIndexingResponse("Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
         }
-
         Optional<SiteEntity> optionalSite = siteService.findByUrlContains(url);
         Optional<PageEntity> optionalPage = pageService
                 .findPageEntityByPathAndSiteId(PageValidator.getPathFromUrl(url), optionalSite.get().getId());
         if (optionalPage.isPresent()) {
-            // TODO: 09.04.2023 удалить существующие индексы и леммы
+            SiteDto siteDto = SiteDtoMapper.toDomain(optionalSite.get());
+            PageDto pageDto = PageDtoMapper.toDomain(optionalPage.get());
+            dataManagerService.deleteLemmaAndIndexByPagePath(siteDto, pageDto);
         } else {
-            // TODO: 09.04.2023 логика добавления новой страницы ее индексов и лемм
-
+            dataManagerService.insertNewPage(url, SiteDtoMapper.toDomain(optionalSite.get()));
             response = new CorrectIndexingResponse();
             response.setResult(true);
         }
         return response;
     }
 
-    private @NotNull RecursiveTask init(String currentUrl, SiteDto dto) {
+    private @NotNull RecursiveTask getInstance(String currentUrl, SiteDto dto) {
         Set<String> siteDataMainPage = pageParserService.parsing(currentUrl, dto);
         return new RecursiveTask(siteDataMainPage, pageParserService, dto, taskContext);
     }

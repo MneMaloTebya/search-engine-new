@@ -2,7 +2,7 @@ package searchengine.services.indexing;
 
 import searchengine.dto.indexing.IndexingResponse;
 
-public interface IndexService {
+public interface IndexingService {
     IndexingResponse startIndex();
     IndexingResponse stopIndex();
     IndexingResponse indexPage(String url);

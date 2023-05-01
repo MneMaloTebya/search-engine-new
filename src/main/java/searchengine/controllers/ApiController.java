@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import searchengine.dto.indexing.IndexingResponse;
 import searchengine.dto.statistics.StatisticsResponse;
-import searchengine.services.indexing.IndexService;
+import searchengine.services.indexing.IndexingService;
 import searchengine.services.statistic.StatisticsService;
 
 @RestController
@@ -15,12 +15,12 @@ public class ApiController {
 
 
     private final StatisticsService statisticsService;
-    private final IndexService indexService;
+    private final IndexingService indexingService;
 
     @Autowired
-    public ApiController(StatisticsService statisticsService, IndexService indexService) {
+    public ApiController(StatisticsService statisticsService, IndexingService indexingService) {
         this.statisticsService = statisticsService;
-        this.indexService = indexService;
+        this.indexingService = indexingService;
     }
 
     @GetMapping("/statistics")
@@ -30,16 +30,16 @@ public class ApiController {
 
     @GetMapping(value = "/startIndexing", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<IndexingResponse> startIndexing() {
-        return ResponseEntity.ok(indexService.startIndex());
+        return ResponseEntity.ok(indexingService.startIndex());
     }
 
     @GetMapping("/stopIndexing")
     public ResponseEntity<IndexingResponse> stopIndexing() {
-        return ResponseEntity.ok(indexService.stopIndex());
+        return ResponseEntity.ok(indexingService.stopIndex());
     }
 
     @PostMapping("/indexPage")
     public ResponseEntity<IndexingResponse> indexPage(@RequestParam String url) {
-        return ResponseEntity.ok(indexService.indexPage(url));
+        return ResponseEntity.ok(indexingService.indexPage(url));
     }
 }

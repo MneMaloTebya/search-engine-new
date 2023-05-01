@@ -2,19 +2,18 @@ package searchengine.services.my_assistant;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import searchengine.services.indexing.IndexServiceImpl;
+import searchengine.services.indexing.IndexingServiceImpl;
 import searchengine.services.page_parser.RecursiveTask;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ForkJoinTask;
 
 public class TaskContext {
 
     private List<RecursiveTask> tasks = new ArrayList<>();
 //    private static boolean poolIsStopped = false;
 
-    private static final Log log = LogFactory.getLog(IndexServiceImpl.class);
+    private static final Log log = LogFactory.getLog(IndexingServiceImpl.class);
 
 //    public boolean isPoolIsStopped() {
 //        return poolIsStopped;
