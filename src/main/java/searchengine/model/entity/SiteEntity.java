@@ -5,6 +5,7 @@ import searchengine.dto.StatusType;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(name = "site")
@@ -20,7 +21,7 @@ public class SiteEntity {
     private StatusType statusType;
 
     @Column(name = "status_time", columnDefinition = "DATETIME(6)", nullable = false)
-    private LocalDateTime statusTime;
+    private Date statusTime;
 
     @Column(name = "last_error", columnDefinition = "TEXT")
     private String lastError;

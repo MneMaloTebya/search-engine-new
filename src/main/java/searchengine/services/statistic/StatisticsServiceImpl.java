@@ -52,9 +52,12 @@ public class StatisticsServiceImpl implements StatisticsService {
                 item.setPages(pages);
                 item.setLemmas(lemmas);
                 item.setStatus(siteEntity.getStatusType().toString());
-                item.setError(siteEntity.getLastError());
-                // TODO: 02.05.2023 поменять переменную времени на Date
-                //item.setStatusTime();
+                if (siteEntity.getLastError() == null) {
+                    item.setError("-");
+                } else {
+                    item.setError(siteEntity.getLastError());
+                }
+                item.setStatusTime(siteEntity.getStatusTime().getTime());
                 total.setPages(total.getPages() + pages);
                 total.setLemmas(total.getLemmas() + lemmas);
                 detailed.add(item);

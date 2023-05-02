@@ -11,6 +11,7 @@ import searchengine.model.entity.SiteEntity;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -45,7 +46,7 @@ public class SiteServiceImpl implements SiteService {
         SiteEntity siteEntity = new SiteEntity();
         siteEntity.setName(site.getName());
         siteEntity.setUrl(site.getUrl());
-        siteEntity.setStatusTime(LocalDateTime.now());
+        siteEntity.setStatusTime(new Date());
         siteEntity.setStatusType(statusType);
         siteRepository.save(siteEntity);
         return siteEntity;
@@ -65,7 +66,7 @@ public class SiteServiceImpl implements SiteService {
             if (entity.getStatusType().equals(StatusType.INDEXING)) {
                 entity.setStatusType(StatusType.FAILED);
                 entity.setLastError(message);
-                entity.setStatusTime(LocalDateTime.now());
+                entity.setStatusTime(new Date());
                 siteRepository.save(entity);
             }
 
@@ -78,7 +79,7 @@ public class SiteServiceImpl implements SiteService {
         if (optionalSite.isPresent()) {
             SiteEntity entity = optionalSite.get();
             entity.setStatusType(StatusType.INDEXED);
-            entity.setStatusTime(LocalDateTime.now());
+            entity.setStatusTime(new Date());
             siteRepository.save(entity);
         }
     }

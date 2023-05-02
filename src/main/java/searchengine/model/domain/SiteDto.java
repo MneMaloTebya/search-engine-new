@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import searchengine.dto.StatusType;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 public class SiteDto {
     private int id;
     private StatusType statusType;
-    private LocalDateTime statusTime;
+    private Date statusTime;
     private String lastError;
     private String url;
     private String name;
