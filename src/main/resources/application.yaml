@@ -2,8 +2,8 @@
 
 indexing-settings:
   sites:
-#    - url: http://www.ipfran.ru/
-#      name: ipfran
+    - url: https://www.ipfran.ru/
+      name: ipfran
     - url: https://www.playback.ru/
       name: PlayBack.Ru
 #    - url: https://ihateregex.io/

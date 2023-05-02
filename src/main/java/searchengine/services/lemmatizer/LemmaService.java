@@ -2,10 +2,11 @@ package searchengine.services.lemmatizer;
 
 import searchengine.model.entity.LemmaEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface LemmaService {
-    Optional<LemmaEntity> findBySiteId(int id);
+    List<LemmaEntity> findAllBySiteId(int id);
     Optional<LemmaEntity> findByLemma(String lemma);
     void deleteAllBySiteId(int id);
     LemmaEntity save(LemmaEntity lemma);

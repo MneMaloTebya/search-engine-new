@@ -1,4 +1,4 @@
-package searchengine.services.index_assistant;
+package searchengine.services.data_manager;
 
 import searchengine.model.domain.PageDto;
 import searchengine.model.domain.SiteDto;

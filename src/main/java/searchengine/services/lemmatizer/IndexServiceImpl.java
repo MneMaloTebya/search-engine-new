@@ -2,10 +2,11 @@ package searchengine.services.lemmatizer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.IndexRepository;
 import searchengine.model.entity.IndexEntity;
 
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class IndexServiceImpl implements IndexService{
@@ -23,12 +24,13 @@ public class IndexServiceImpl implements IndexService{
     }
 
     @Override
+    @Transactional
     public void deleteAllByPageId(int id) {
         indexRepository.deleteAllByPageId(id);
     }
 
     @Override
-    public Optional<IndexEntity> findByPageId(int id) {
-        return indexRepository.findByPageId(id);
+    public List<IndexEntity> findAllByPageId(int id) {
+        return indexRepository.findAllByPageId(id);
     }
 }

@@ -17,12 +17,9 @@ public class SitesList {
     private List<Site> sites;
 
     public boolean urlIsLocatedConfig(String url) {
-        List<String> siteUrl = new ArrayList<>();
         for (Site site : sites) {
-            siteUrl.add(site.getUrl());
-        }
-        for (String site : siteUrl) {
-            if (site.contains(PageValidator.getHostFromUrl(url))) {
+            String host = PageValidator.getHostFromUrl(url);
+            if (host.contains(site.getUrl())) {
                 return true;
             }
         }

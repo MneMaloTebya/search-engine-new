@@ -7,5 +7,4 @@ import java.util.Optional;
 
 public interface SiteRepository extends JpaRepository<SiteEntity, Integer> {
     Optional<SiteEntity> findByUrl(String url);
-    Optional<SiteEntity> findByUrlContains(String pageUrl);
 }

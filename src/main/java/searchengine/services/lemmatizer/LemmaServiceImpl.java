@@ -2,9 +2,11 @@ package searchengine.services.lemmatizer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.LemmaRepository;
 import searchengine.model.entity.LemmaEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,8 +21,8 @@ public class LemmaServiceImpl implements LemmaService {
 
 
     @Override
-    public Optional<LemmaEntity> findBySiteId(int id) {
-        return lemmaRepository.findBySiteId(id);
+    public List<LemmaEntity> findAllBySiteId(int id) {
+        return lemmaRepository.findAllBySiteId(id);
     }
 
     @Override
@@ -29,6 +31,7 @@ public class LemmaServiceImpl implements LemmaService {
     }
 
     @Override
+    @Transactional
     public void deleteAllBySiteId(int id) {
         lemmaRepository.deleteAllBySiteId(id);
     }

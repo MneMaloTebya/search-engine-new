@@ -50,7 +50,7 @@ public class PageValidator {
     public static String getHostFromUrl(String pageUrl) {
         try {
             URL url = new URL(pageUrl);
-            return url.getHost();
+            return url.getProtocol() + "://" + url.getHost() + "/";
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

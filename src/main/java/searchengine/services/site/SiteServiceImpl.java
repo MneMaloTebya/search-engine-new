@@ -6,11 +6,10 @@ import searchengine.config.Site;
 import searchengine.dto.StatusType;
 import searchengine.model.PageRepository;
 import searchengine.model.SiteRepository;
-import searchengine.model.domain.SiteDto;
 import searchengine.model.entity.SiteEntity;
+import searchengine.services.page_parser.PageValidator;
 
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 
@@ -52,10 +51,9 @@ public class SiteServiceImpl implements SiteService {
         return siteEntity;
     }
 
-
     @Override
     public Optional<SiteEntity> findByUrlContains(String pageUrl) {
-        return siteRepository.findByUrlContains(pageUrl);
+        return siteRepository.findByUrl(PageValidator.getHostFromUrl(pageUrl));
     }
 
     @Override
@@ -69,7 +67,6 @@ public class SiteServiceImpl implements SiteService {
                 entity.setStatusTime(new Date());
                 siteRepository.save(entity);
             }
-
         }
     }
 

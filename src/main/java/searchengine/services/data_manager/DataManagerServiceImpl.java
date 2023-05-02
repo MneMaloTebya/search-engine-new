@@ -1,4 +1,4 @@
-package searchengine.services.index_assistant;
+package searchengine.services.data_manager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,8 +20,9 @@ import searchengine.services.page.PageService;
 import searchengine.services.page_parser.PageValidator;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class DataManagerServiceImpl implements DataManagerService {
@@ -89,31 +90,25 @@ public class DataManagerServiceImpl implements DataManagerService {
     public void insertLemmaAndIndexToDB(SiteDto siteDto, PageDto pageDto, String text) {
         try {
             LemmaFinder lemmaFinder = LemmaFinder.getInstance();
-            Set<String> lemmas = lemmaFinder.getLemmaSet(text);
-
-            for (String lemma : lemmas) {
+            Map<String, Integer> lemmaMap = lemmaFinder.collectLemmas(text);
+            lemmaMap.forEach((key, value) -> {
                 LemmaEntity lemmaEntity = new LemmaEntity();
                 IndexEntity indexEntity = new IndexEntity();
-
-                Optional<LemmaEntity> optionalLemma = lemmaService.findByLemma(lemma);
-
+                Optional<LemmaEntity> optionalLemma = lemmaService.findByLemma(key);
                 if (optionalLemma.isEmpty()) {
-                    lemmaEntity.setLemma(lemma);
+                    lemmaEntity.setLemma(key);
                     lemmaEntity.setFrequency(1);
                 } else {
                     lemmaEntity = optionalLemma.get();
                     lemmaEntity.setFrequency(lemmaEntity.getFrequency() + 1);
                 }
-
                 lemmaEntity.setSiteId(siteDto.getId());
                 lemmaService.save(lemmaEntity);
-
                 indexEntity.setLemmaId(lemmaEntity.getId());
                 indexEntity.setPageId(pageDto.getId());
-                indexEntity.setRank(1.1f); // TODO: 01.05.2023 заглушка! Позже поменять.
-
+                indexEntity.setRank(value);
                 indexService.save(indexEntity);
-            }
+            });
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -122,10 +117,10 @@ public class DataManagerServiceImpl implements DataManagerService {
 
     @Override
     public void deleteLemmaAndIndexByPagePath(SiteDto siteDto, PageDto pageDto) {
-        Optional<LemmaEntity> optionalLemma = lemmaService.findBySiteId(siteDto.getId());
-        Optional<IndexEntity> optionalIndex = indexService.findByPageId(pageDto.getId());
+        List<LemmaEntity> lemmas = lemmaService.findAllBySiteId(siteDto.getId());
+        List<IndexEntity> indexes = indexService.findAllByPageId(pageDto.getId());
         pageService.deleteByPathAndSiteId(pageDto.getPath(), siteDto.getId());
-        if (optionalIndex.isPresent() && optionalLemma.isPresent()) {
+        if (!indexes.isEmpty() || !lemmas.isEmpty()) {
             lemmaService.deleteAllBySiteId(siteDto.getId());
             indexService.deleteAllByPageId(pageDto.getId());
         }

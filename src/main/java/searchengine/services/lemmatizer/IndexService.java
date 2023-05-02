@@ -2,10 +2,10 @@ package searchengine.services.lemmatizer;
 
 import searchengine.model.entity.IndexEntity;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface IndexService {
     IndexEntity save(IndexEntity entity);
     void deleteAllByPageId(int id);
-    Optional<IndexEntity> findByPageId(int id);
+    List<IndexEntity> findAllByPageId(int id);
 }

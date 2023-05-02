@@ -17,7 +17,7 @@ import searchengine.model.domain.SiteDto;
 import searchengine.model.domain.SiteDtoMapper;
 import searchengine.model.entity.PageEntity;
 import searchengine.model.entity.SiteEntity;
-import searchengine.services.index_assistant.DataManagerService;
+import searchengine.services.data_manager.DataManagerService;
 import searchengine.services.my_assistant.TaskContext;
 import searchengine.services.page.PageService;
 import searchengine.services.page_parser.PageParserService;
@@ -44,7 +44,8 @@ public class IndexingServiceImpl implements IndexingService {
     private static final Log log = LogFactory.getLog(IndexingServiceImpl.class);
 
     @Autowired
-    public IndexingServiceImpl(SitesList sitesList, SiteService siteService, PageService pageService, PageParserService pageParserService, DataManagerService dataManagerService) {
+    public IndexingServiceImpl(SitesList sitesList, SiteService siteService, PageService pageService,
+                               PageParserService pageParserService, DataManagerService dataManagerService) {
         this.sitesList = sitesList;
         this.siteService = siteService;
         this.pageService = pageService;
@@ -96,18 +97,18 @@ public class IndexingServiceImpl implements IndexingService {
 
     @Override
     public IndexingResponse indexPage(String url) {
-        IndexingResponse response = null;
-        if (sitesList.urlIsLocatedConfig(url)) {
+        IndexingResponse response;
+        if (!sitesList.urlIsLocatedConfig(url)) {
             response = new ErrorIndexingResponse("Данная страница находится за пределами сайтов, указанных в конфигурационном файле");
-        }
-        Optional<SiteEntity> optionalSite = siteService.findByUrlContains(url);
-        Optional<PageEntity> optionalPage = pageService
-                .findPageEntityByPathAndSiteId(PageValidator.getPathFromUrl(url), optionalSite.get().getId());
-        if (optionalPage.isPresent()) {
-            SiteDto siteDto = SiteDtoMapper.toDomain(optionalSite.get());
-            PageDto pageDto = PageDtoMapper.toDomain(optionalPage.get());
-            dataManagerService.deleteLemmaAndIndexByPagePath(siteDto, pageDto);
         } else {
+            Optional<SiteEntity> optionalSite = siteService.findByUrlContains(url);
+            Optional<PageEntity> optionalPage = pageService
+                    .findPageEntityByPathAndSiteId(PageValidator.getPathFromUrl(url), optionalSite.get().getId());
+            if (optionalPage.isPresent()) {
+                SiteDto siteDto = SiteDtoMapper.toDomain(optionalSite.get());
+                PageDto pageDto = PageDtoMapper.toDomain(optionalPage.get());
+                dataManagerService.deleteLemmaAndIndexByPagePath(siteDto, pageDto);
+            }
             dataManagerService.insertNewPage(url, SiteDtoMapper.toDomain(optionalSite.get()));
             response = new CorrectIndexingResponse();
             response.setResult(true);

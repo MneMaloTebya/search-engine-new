@@ -1,6 +1,7 @@
 package searchengine.services.page;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import searchengine.model.PageRepository;
 import searchengine.model.domain.SiteDto;
 import searchengine.model.entity.PageEntity;
@@ -27,6 +28,7 @@ public class PageServiceImpl implements PageService{
     }
 
     @Override
+    @Transactional
     public void deleteByPathAndSiteId(String path, int id) {
         pageRepository.deleteByPathAndSiteId(path, id);
     }

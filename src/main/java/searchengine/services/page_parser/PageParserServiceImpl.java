@@ -5,9 +5,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import searchengine.model.domain.PageDto;
 import searchengine.model.domain.SiteDto;
-import searchengine.services.index_assistant.DataManagerService;
+import searchengine.services.data_manager.DataManagerService;
 import searchengine.services.my_assistant.MyConnector;
 
 import java.io.IOException;

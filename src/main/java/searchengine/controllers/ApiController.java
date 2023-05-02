@@ -1,6 +1,7 @@
 package searchengine.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +40,15 @@ public class ApiController {
     }
 
     @PostMapping("/indexPage")
-    public ResponseEntity<IndexingResponse> indexPage(@RequestParam String url) {
+    public ResponseEntity<IndexingResponse> indexPage(@RequestParam(name = "url") String url) {
         return ResponseEntity.ok(indexingService.indexPage(url));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<IndexingResponse> search(@RequestParam String query,
+                                                   @RequestParam String site,
+                                                   @RequestParam int offset,
+                                                   @RequestParam int limit) {
+        return ResponseEntity.ok(null);
     }
 }
