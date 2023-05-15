@@ -11,4 +11,6 @@ public interface LemmaService {
     void deleteAllBySiteId(int id);
     LemmaEntity save(LemmaEntity lemma);
     int countBySiteId(int id);
+    List<LemmaEntity> findAll();
+    List<LemmaEntity> findAllByUrl(String url);
 }

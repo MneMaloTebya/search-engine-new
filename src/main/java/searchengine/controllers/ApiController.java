@@ -1,13 +1,14 @@
 package searchengine.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import searchengine.dto.indexing.IndexingResponse;
+import searchengine.dto.indx_resp.IndexingResponse;
+import searchengine.dto.search_resp.SearchResponse;
 import searchengine.dto.statistics.StatisticsResponse;
 import searchengine.services.indexing.IndexingService;
+import searchengine.services.search.SearchService;
 import searchengine.services.statistic.StatisticsService;
 
 @RestController
@@ -17,11 +18,13 @@ public class ApiController {
 
     private final StatisticsService statisticsService;
     private final IndexingService indexingService;
+    private final SearchService searchService;
 
     @Autowired
-    public ApiController(StatisticsService statisticsService, IndexingService indexingService) {
+    public ApiController(StatisticsService statisticsService, IndexingService indexingService, SearchService searchService) {
         this.statisticsService = statisticsService;
         this.indexingService = indexingService;
+        this.searchService = searchService;
     }
 
     @GetMapping("/statistics")
@@ -45,10 +48,10 @@ public class ApiController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<IndexingResponse> search(@RequestParam String query,
-                                                   @RequestParam String site,
-                                                   @RequestParam int offset,
-                                                   @RequestParam int limit) {
-        return ResponseEntity.ok(null);
+    public ResponseEntity<SearchResponse> search(@RequestParam String query,
+                                                 @RequestParam String site,
+                                                 @RequestParam int offset,
+                                                 @RequestParam int limit) {
+        return ResponseEntity.ok(searchService.search(query, site, offset, limit));
     }
 }

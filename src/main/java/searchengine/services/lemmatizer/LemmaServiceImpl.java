@@ -45,4 +45,9 @@ public class LemmaServiceImpl implements LemmaService {
     public int countBySiteId(int id) {
         return lemmaRepository.countBySiteId(id);
     }
+
+    @Override
+    public List<LemmaEntity> findAll() {
+        return lemmaRepository.findAll();
+    }
 }

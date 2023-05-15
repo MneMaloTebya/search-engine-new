@@ -1,4 +1,4 @@
-package searchengine.dto.indexing;
+package searchengine.dto.indx_resp;
 
 public class ErrorIndexingResponse extends IndexingResponse {
 
