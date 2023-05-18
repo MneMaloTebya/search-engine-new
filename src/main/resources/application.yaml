@@ -2,14 +2,12 @@
 
 indexing-settings:
   sites:
-    - url: https://www.ipfran.ru/
-      name: ipfran
-    - url: https://www.playback.ru/
-      name: PlayBack.Ru
-#    - url: https://www.rosatom.ru/index.html
-#      name: RosAtom
-#    - url: https://xn--80aeeirqv7i.xn--p1ai/
-#      name: JumpWay
+#    - url: https://www.playback.ru/
+#      name: PlayBack.Ru
+    - url: https://www.rosavillage.ru/
+      name: Rosa Village
+    - url: https://xn--80aeeirqv7i.xn--p1ai/
+      name: JumpWay
 
 
 server:

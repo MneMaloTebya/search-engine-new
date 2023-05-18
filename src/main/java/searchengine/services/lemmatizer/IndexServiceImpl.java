@@ -33,4 +33,11 @@ public class IndexServiceImpl implements IndexService{
     public List<IndexEntity> findAllByPageId(int id) {
         return indexRepository.findAllByPageId(id);
     }
+
+    @Override
+    public List<IndexEntity> findAllByLemmaId(int id) {
+        return indexRepository.findAllByLemmaId(id);
+    }
+
+
 }

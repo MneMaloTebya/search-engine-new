@@ -6,6 +6,7 @@ import searchengine.model.PageRepository;
 import searchengine.model.domain.SiteDto;
 import searchengine.model.entity.PageEntity;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,5 +47,15 @@ public class PageServiceImpl implements PageService{
     @Override
     public int countBySiteId(int id) {
         return pageRepository.countBySiteId(id);
+    }
+
+    @Override
+    public List<PageEntity> findAllBySiteId(int id) {
+        return pageRepository.findAllBySiteId(id);
+    }
+
+    @Override
+    public Optional<PageEntity> findById(int id) {
+        return pageRepository.findById(id);
     }
 }

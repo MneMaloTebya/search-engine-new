@@ -8,4 +8,5 @@ public interface IndexService {
     IndexEntity save(IndexEntity entity);
     void deleteAllByPageId(int id);
     List<IndexEntity> findAllByPageId(int id);
+    List<IndexEntity> findAllByLemmaId(int id);
 }

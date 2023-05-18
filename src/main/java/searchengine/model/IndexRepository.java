@@ -8,4 +8,5 @@ import java.util.List;
 public interface IndexRepository extends JpaRepository<IndexEntity, Integer> {
     List<IndexEntity> findAllByPageId(int id);
     void deleteAllByPageId(int id);
+    List<IndexEntity> findAllByLemmaId(int id);
 }

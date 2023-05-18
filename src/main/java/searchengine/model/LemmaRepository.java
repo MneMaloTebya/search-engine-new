@@ -2,6 +2,7 @@ package searchengine.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import searchengine.model.entity.LemmaEntity;
+import searchengine.model.entity.PageEntity;
 
 import java.util.List;
 import java.util.Optional;
