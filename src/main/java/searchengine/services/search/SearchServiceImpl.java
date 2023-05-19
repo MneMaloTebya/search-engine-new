@@ -3,9 +3,10 @@ package searchengine.services.search;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import searchengine.dto.search_resp.SearchResponse;
+import searchengine.model.domain.PageDto;
+import searchengine.model.domain.PageDtoMapper;
 import searchengine.model.entity.IndexEntity;
 import searchengine.model.entity.LemmaEntity;
-import searchengine.model.entity.PageEntity;
 import searchengine.model.entity.SiteEntity;
 import searchengine.services.lemmatizer.IndexService;
 import searchengine.services.lemmatizer.LemmaFinder;
@@ -48,41 +49,51 @@ public class SearchServiceImpl implements SearchService {
         }
     }
 
-    private List<LemmaEntity> dropPopularLemmas(String url, String query) {
+    private List<LemmaEntity> collectLemmas(String url, String query) {
         Set<String> lemmasQuery = replaceQuery(query);
-        SiteEntity siteEntity = siteService.findByUrl(url).orElse(null);
-        List<LemmaEntity> lemmasBySite = lemmaService.findAllBySiteId(siteEntity.getId());
-        int countLemmasSite = lemmasBySite.size();
+        List<LemmaEntity> lemmas;
+        if (url == null) {
+            lemmas = lemmaService.findAll();
+            dropPopular(lemmasQuery, lemmas);
+        } else {
+            SiteEntity siteEntity = siteService.findByUrl(url).orElse(null); // TODO: 19.05.2023 проверить корректность урла на входе
+            lemmas = lemmaService.findAllBySiteId(siteEntity.getId());
+            dropPopular(lemmasQuery, lemmas);
+        }
+        return lemmas;
+    }
+
+    private void dropPopular(Set<String> lemmasQuery, List<LemmaEntity> lemmas) {
+        int lemmasCount = lemmas.size();
         for (String lemma : lemmasQuery) {
             Optional<LemmaEntity> optionalLemma = lemmaService.findByLemma(lemma);
             if (optionalLemma.isPresent()) {
                 LemmaEntity lemmaEntity = optionalLemma.get();
                 int frequency = lemmaEntity.getFrequency();
-                int popular = frequency / countLemmasSite * 100;
-                if (popular >= 5) {
-                    lemmasBySite.remove(lemmaEntity);
+                int popular = frequency / lemmasCount * 100;
+                if (popular >= 5) { // TODO: 19.05.2023 тестовое значение
+                    lemmas.remove(lemmaEntity);
                 }
             }
         }
-        return lemmasBySite;
     }
 
     private List<LemmaEntity> sortLemmas(List<LemmaEntity> lemmasBySite) {
         return lemmasBySite.stream().sorted(Comparator.comparing(LemmaEntity::getFrequency).reversed()).toList();
     }
 
-    private Set<PageEntity> filterPage(String site, String query) {
-        Set<PageEntity> sortedPages = new TreeSet<>();
+    private void filterPage(String site, String query) {
+
         SiteEntity siteEntity = siteService.findByUrl(site).orElse(null);
-        List<LemmaEntity> sortedLemmas = sortLemmas(dropPopularLemmas(siteEntity.getUrl(), query));
+        List<LemmaEntity> sortedLemmas = sortLemmas(collectLemmas(siteEntity.getUrl(), query));
 
         for (LemmaEntity lemma : sortedLemmas) {
             List<IndexEntity> indexes = indexService.findAllByLemmaId(lemma.getId());
             for (IndexEntity index : indexes) {
-                PageEntity page = pageService.findById(index.getPageId()).orElse(null);
-                sortedPages.add(page);
+                PageDto pageDto = PageDtoMapper.toDomain(pageService.findById(index.getPageId()).orElse(null));
+
             }
         }
-        return sortedPages;
+
     }
 }
